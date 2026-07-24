@@ -214,11 +214,9 @@ a { color: inherit; text-decoration: none; }
 
 .fact-grid {
   margin-top: 40px;
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
-  background: var(--border);
-  border: 1px solid var(--border);
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
 }
-.fact-card { background: var(--bg); padding: 22px; }
+.fact-card { padding: 22px; }
 .fact-label { font-family: var(--font-mono); font-size: 11px; color: var(--text-faint); letter-spacing: 0.08em; margin-bottom: 10px; }
 .fact-value { font-family: var(--font-display); font-weight: 600; font-size: 17px; margin-bottom: 4px; }
 .fact-detail { color: var(--text-dim); font-size: 13px; margin: 0; }
@@ -237,8 +235,8 @@ a { color: inherit; text-decoration: none; }
 /* ============ PILLARS ============ */
 .pillars { padding: 88px 0; }
 .pillars h2 { font-size: clamp(1.6rem, 2.6vw, 2.1rem); max-width: 22ch; }
-.pillar-grid { margin-top: 40px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
-.pillar-card { background: var(--bg); padding: 30px 26px; }
+.pillar-grid { margin-top: 40px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.pillar-card { padding: 30px 26px; }
 .pillar-tag { font-family: var(--font-mono); font-size: 11px; color: var(--amber); letter-spacing: 0.08em; margin-bottom: 14px; }
 .pillar-card h3 { font-size: 1.2rem; }
 .pillar-card p { color: var(--text-dim); font-size: 14px; margin: 0; }
@@ -462,6 +460,196 @@ a { color: inherit; text-decoration: none; }
   .magnetic, .tilt-card { transition: none !important; }
 }
 
+/* ============================================================
+   LIQUID GLASS — frosted, refractive surfaces with a
+   cursor-tracked specular highlight, layered over the blueprint.
+   ============================================================ */
+:root {
+  --glass-bg: rgba(180, 205, 230, 0.05);
+  --glass-bg-hover: rgba(180, 205, 230, 0.085);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-border-hover: rgba(255, 255, 255, 0.26);
+  --glass-radius: 18px;
+}
+
+.glass-surface {
+  position: relative;
+  background: var(--glass-bg) !important;
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--glass-radius);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -12px 24px -18px rgba(0, 0, 0, 0.5),
+    0 14px 32px -12px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, transform 0.25s ease;
+}
+
+/* refractive top sheen — fixed, gives the "glass slab" read even without hover */
+.glass-surface::after {
+  content: "";
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.12) 0%, transparent 30%);
+}
+
+/* specular highlight that follows the cursor */
+.glass-surface::before {
+  content: "";
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(circle at var(--mx, 30%) var(--my, 15%), rgba(255, 255, 255, 0.22), transparent 55%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.glass-surface:hover {
+  background: var(--glass-bg-hover) !important;
+  border-color: var(--glass-border-hover) !important;
+}
+.glass-surface:hover::before { opacity: 1; }
+
+/* make sure real content paints above the sheen/highlight pseudo-layers */
+.glass-surface > * { position: relative; z-index: 2; }
+
+/* project cards keep their own corner brackets + tilt; layer glass underneath */
+.project-card.glass-surface { border-radius: var(--glass-radius); }
+.project-card.glass-surface:hover { border-color: var(--cyan) !important; }
+.project-card.glass-surface .corner { z-index: 3; }
+
+/* floating glass nav bar */
+.site-nav {
+  background: transparent; border-bottom: none;
+  padding: 14px 20px 0;
+}
+.nav-inner {
+  max-width: var(--container); margin: 0 auto; padding: 13px 24px;
+  background: rgba(16, 22, 40, 0.55);
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 10px 30px -14px rgba(0,0,0,0.55);
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, padding 0.3s ease;
+}
+.site-nav.scrolled { box-shadow: none; }
+.site-nav.scrolled .nav-inner {
+  background: rgba(16, 22, 40, 0.78);
+  border-color: var(--glass-border-hover);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), 0 14px 36px -14px rgba(0,0,0,0.6);
+}
+
+/* glass chip for timeline badges */
+.glass-chip {
+  background: rgba(111, 227, 163, 0.08) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* glass treatment for the ghost button */
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+}
+.btn-ghost:hover {
+  background: rgba(76, 201, 240, 0.08);
+  border-color: var(--glass-border-hover);
+}
+.btn-primary { border-radius: 999px; }
+
+@media (max-width: 640px) {
+  .site-nav { padding: 10px 12px 0; }
+  .nav-inner { border-radius: 22px; padding: 12px 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-surface, .glass-surface::before, .site-nav, .nav-inner { transition: none !important; }
+}
+
+/* ============================================================
+   LIQUID GLASS — frosted, translucent material w/ moving sheen
+   ============================================================ */
+:root {
+  --glass-bg: rgba(16, 26, 51, 0.42);
+  --glass-bg-strong: rgba(16, 26, 51, 0.6);
+  --glass-border: rgba(231, 236, 245, 0.16);
+  --glass-radius: 18px;
+}
+
+.glass {
+  position: relative;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    inset 0 0 0 1px rgba(255,255,255,0.02),
+    0 10px 30px rgba(0,0,0,0.28);
+  overflow: hidden;
+}
+
+/* top glossy edge, like light catching the rim of glass */
+.glass::after {
+  content: "";
+  position: absolute; top: 0; left: 8%; right: 8%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  pointer-events: none;
+}
+
+/* moving specular highlight, tracked to cursor via --mx/--my custom props */
+.glass::before {
+  content: "";
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(circle 220px at var(--mx, 50%) var(--my, 0%),
+    rgba(255,255,255,0.16), rgba(255,255,255,0.04) 45%, transparent 70%);
+  opacity: 0; transition: opacity 0.4s ease;
+}
+.glass:hover::before { opacity: 1; }
+
+.glass > * { position: relative; z-index: 1; }
+
+/* project cards keep their reticle corners above the glass sheen */
+.project-card.glass .corner { z-index: 2; }
+
+/* frosted ghost buttons */
+.glass-btn {
+  background: rgba(231, 236, 245, 0.06);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.glass-btn:hover {
+  background: rgba(76,201,240,0.10);
+  border-color: rgba(76,201,240,0.4);
+}
+
+/* give the primary buttons a matching glass-pill shape */
+.btn-primary { border-radius: 999px; }
+
+/* nav becomes a glass bar */
+.site-nav {
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(160%);
+}
+
+/* hud frame gets a glass rim to match */
+.hud-frame {
+  border-radius: 20px;
+  border-color: var(--glass-border);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 20px 44px rgba(0,0,0,0.35);
+}
+.hud-frame .corner { border-radius: 3px; }
+
+@media (max-width: 640px) {
+  .fact-grid, .pillar-grid { gap: 12px; }
+}
+
 </style>
 </head>
 <body>
@@ -496,7 +684,7 @@ a { color: inherit; text-decoration: none; }
   <section class="hero" id="top">
     <div class="hero-inner">
       <div class="hero-copy">
-        <p class="eyebrow load-in load-1"><span class="dot"></span>BENG ROBOTICS, UWE BRISTOL · SPRINGDALES SCHOOL, DHAULA KUAN</p>
+        <p class="eyebrow load-in load-1"><span class="dot"></span>SPRINGDALES SCHOOL, DHAULA KUAN · CLASS 12</p>
         <h1 class="load-in load-2">I build things that <span class="accent">fly</span>, race, and win.</h1>
         <p class="hero-sub load-in load-3">
           Self-taught drone builder and robotics competitor with 12+ national and inter-school
@@ -505,7 +693,7 @@ a { color: inherit; text-decoration: none; }
         </p>
         <div class="hero-actions load-in load-4">
           <a href="#projects" class="btn btn-primary magnetic">View my builds</a>
-          <a href="#contact" class="btn btn-ghost magnetic">Get in touch</a>
+          <a href="#contact" class="btn btn-ghost magnetic glass-btn">Get in touch</a>
         </div>
       </div>
 
@@ -520,7 +708,7 @@ a { color: inherit; text-decoration: none; }
           <div class="hud-readout bottom-left">ALT <span class="ok">120m</span></div>
           <div class="hud-readout bottom-right">MODE <span class="ok">RTL</span></div>
         </div>
-        <p class="hud-caption">Dhruv Gandhi</p>
+        <p class="hud-caption">Field notes from a GPS hexacopter build — 1kg payload, autonomous return-to-home.</p>
       </div>
     </div>
   </section>
@@ -540,22 +728,22 @@ a { color: inherit; text-decoration: none; }
       </p>
 
       <div class="fact-grid">
-        <div class="fact-card reveal">
+        <div class="fact-card reveal glass">
           <p class="fact-label">Focus</p>
           <p class="fact-value">Robotics &amp; Drones</p>
           <p class="fact-detail">GPS hexacopters, RTL flight, PID-tuned bots</p>
         </div>
-        <div class="fact-card reveal">
+        <div class="fact-card reveal glass">
           <p class="fact-label">Now</p>
           <p class="fact-value">Intern, Faircent &amp; Freedm.ai</p>
           <p class="fact-detail">Fintech &amp; ambient-AI finance tools</p>
         </div>
-        <div class="fact-card reveal">
+        <div class="fact-card reveal glass">
           <p class="fact-label">Academics</p>
           <p class="fact-value">PCM · Class 12</p>
           <p class="fact-detail">Springdales School, Dhaula Kuan</p>
         </div>
-        <div class="fact-card reveal">
+        <div class="fact-card reveal glass">
           <p class="fact-label">Also</p>
           <p class="fact-value">Origami, under Ankon Mitra</p>
           <p class="fact-detail">Two national first-prize titles</p>
@@ -594,19 +782,19 @@ a { color: inherit; text-decoration: none; }
       <p class="lede">Hands-on work across three areas, all learned by doing.</p>
 
       <div class="pillar-grid">
-        <div class="pillar-card reveal">
+        <div class="pillar-card reveal glass">
           <p class="pillar-tag">01 · Hardware</p>
           <h3>Robotics &amp; Drones</h3>
           <p>GPS-enabled hexacopters with autonomous return-to-home, PID-tuned line-followers,
           robowar bots, and an off-road racer built chassis-to-code in a single night.</p>
         </div>
-        <div class="pillar-card reveal">
+        <div class="pillar-card reveal glass">
           <p class="pillar-tag">02 · Strategy</p>
           <h3>Innovation &amp; Entrepreneurship</h3>
           <p>Design and product lead on an award-winning team at the Dassault Systèmes / NITI
           Aayog Seed the Future Entrepreneurs challenge, plus IIT Delhi's Young Changemakers bootcamp.</p>
         </div>
-        <div class="pillar-card reveal">
+        <div class="pillar-card reveal glass">
           <p class="pillar-tag">03 · Craft</p>
           <h3>Origami &amp; Design</h3>
           <p>Trained in person under architect and origami artist Ankon Mitra. Two national
@@ -623,37 +811,37 @@ a { color: inherit; text-decoration: none; }
       <h2 class="reveal">Projects &amp; competition entries.</h2>
 
       <div class="project-grid">
-        <a class="project-card reveal tilt-card" href="#contact">
+        <a class="project-card reveal tilt-card glass" href="#contact">
           <span class="corner tl"></span><span class="corner br"></span>
           <p class="project-tag">Hardware · Aerospace</p>
           <h3>GPS Hexacopter Drone</h3>
           <p>Self-built hexacopter with 1kg payload capacity and autonomous RTL (return-to-home) flight.</p>
         </a>
-        <a class="project-card reveal tilt-card" href="https://dhruv-2008.github.io/AI-DJ-WEB-APP" target="_blank" rel="noopener">
+        <a class="project-card reveal tilt-card glass" href="https://dhruv-2008.github.io/AI-DJ-WEB-APP" target="_blank" rel="noopener">
           <span class="corner tl"></span><span class="corner br"></span>
           <p class="project-tag">Software · Computer Vision</p>
           <h3>AI Object Identifier</h3>
           <p>A JavaScript web app using the coco-ssd model to identify objects live through a camera feed.</p>
         </a>
-        <a class="project-card reveal tilt-card" href="#achievements">
+        <a class="project-card reveal tilt-card glass" href="#achievements">
           <span class="corner tl"></span><span class="corner br"></span>
           <p class="project-tag">Hardware · Controls</p>
           <h3>Line-Following Robot</h3>
           <p>1st place, Roboline Rumble. Over 10 days spent fine-tuning PID control for reliable tracking.</p>
         </a>
-        <a class="project-card reveal tilt-card" href="#achievements">
+        <a class="project-card reveal tilt-card glass" href="#achievements">
           <span class="corner tl"></span><span class="corner br"></span>
           <p class="project-tag">Hardware · Competition</p>
           <h3>RoboWar Bot, v1 &amp; v2</h3>
           <p>Built with a friend, then rebuilt after v1's losses. v2 went on to win its next competition.</p>
         </a>
-        <a class="project-card reveal tilt-card" href="#about">
+        <a class="project-card reveal tilt-card glass" href="#about">
           <span class="corner tl"></span><span class="corner br"></span>
           <p class="project-tag">Physics · Investigatory</p>
           <h3>Tesla Coil</h3>
           <p>An investigatory build stepping up 12V DC to roughly 5,500V for a school physics project.</p>
         </a>
-        <a class="project-card reveal tilt-card" href="#contact">
+        <a class="project-card reveal tilt-card glass" href="#contact">
           <span class="corner tl"></span><span class="corner br"></span>
           <p class="project-tag">In progress</p>
           <h3>Electric Scooter</h3>
@@ -759,8 +947,8 @@ a { color: inherit; text-decoration: none; }
         can build, code, and compete. If that's you, I'd love to hear from you.
       </p>
       <div class="hero-actions" style="justify-content: center; margin-top: 4px;">
-        <a href="mailto:dhruvgandhi08@icloud.com" class="btn btn-primary magnetic">Get In Touch</a>
-        <a href="https://www.linkedin.com/in/dhruv-gandhi-cv/" target="_blank" rel="noopener" class="btn btn-ghost magnetic">Connect on LinkedIn</a>
+        <a href="mailto:hello@dhruvgandhi.dev" class="btn btn-primary magnetic">hello@dhruvgandhi.dev</a>
+        <a href="https://www.linkedin.com/in/dhruv-gandhi-cv/" target="_blank" rel="noopener" class="btn btn-ghost magnetic glass-btn">Connect on LinkedIn</a>
       </div>
     </div>
   </section>
@@ -772,7 +960,8 @@ a { color: inherit; text-decoration: none; }
     <p>&copy; <span id="year"></span> Dhruv Gandhi. All rights reserved.</p>
     <div class="footer-links">
       <a href="https://www.linkedin.com/in/dhruv-gandhi-cv/" target="_blank" rel="noopener">LinkedIn</a>
-      <a href="mailto:dhruvgandhi08@icloud.com">Email</a>
+      <a href="https://dhruv-2008.github.io/AI-DJ-WEB-APP" target="_blank" rel="noopener">GitHub Project</a>
+      <a href="mailto:hello@dhruvgandhi.dev">Email</a>
     </div>
   </div>
 </footer>
@@ -924,6 +1113,19 @@ if (isFinePointer && !prefersReducedMotion) {
     });
     card.addEventListener('mouseleave', () => {
       card.style.transform = '';
+    });
+  });
+}
+
+/* ---------- liquid glass: cursor-tracked specular highlight ---------- */
+if (isFinePointer && !prefersReducedMotion) {
+  document.querySelectorAll('.glass').forEach(panel => {
+    panel.addEventListener('mousemove', (e) => {
+      const rect = panel.getBoundingClientRect();
+      const mx = ((e.clientX - rect.left) / rect.width) * 100;
+      const my = ((e.clientY - rect.top) / rect.height) * 100;
+      panel.style.setProperty('--mx', mx.toFixed(1) + '%');
+      panel.style.setProperty('--my', my.toFixed(1) + '%');
     });
   });
 }
